@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Calculator</title>
+	<style>
+    body {
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.calculator {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #eee;
+}
+
+.calculator-screen {
+    width: 95%;
+    height: 40px;
+    border: none;
+    background-color: #222;
+    color: #fff;
+    text-align: right;
+    padding: 0 10px;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.calculator-keys {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+}
+
+button {
+    height: 60px;
+    font-size: 1.5em;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #ddd;
+}
+
+.operator {
+    background-color: #f99;
+}
+
+.operator:hover {
+    background-color: #f77;
+}
+
+.equal-sign {
+    grid-column: span 4;
+    background-color: #4CAF50;
+    color: white;
+}
+
+.equal-sign:hover {
+    background-color: #45a049;
+}
+
+.all-clear {
+    background-color: #f44;
+}
+
+.all-clear:hover {
+    background-color: #e33;
+}
+  </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" class="calculator-screen" id="display" disabled>
+        <div class="calculator-keys">
+            <button class="operator" value="+">+</button>
+            <button class="operator" value="-">-</button>
+            <button class="operator" value="*">&times;</button>
+            <button class="operator" value="/">&divide;</button>
+            <button value="7">7</button>
+            <button value="8">8</button>
+            <button value="9">9</button>
+            <button value="4">4</button>
+            <button value="5">5</button>
+            <button value="6">6</button>
+            <button value="1">1</button>
+            <button value="2">2</button>
+            <button value="3">3</button>
+            <button value="0">0</button>
+            <button class="decimal" value=".">.</button>
+            <button class="all-clear" value="all-clear">AC</button>
+            <button class="equal-sign operator" value="=">=</button>
+        </div>
+    </div>
+  <script>
+    const display = document.getElementById('display');
+const calculator = document.querySelector('.calculator-keys');
+
+let firstValue = null;
+let operator = null;
+let waitingForSecondValue = false;
+
+calculator.addEventListener('click', (event) => {
+    const { target } = event;
+    const value = target.value;
+
+    if (!target.matches('button')) {
+        return;
+    }
+
+    switch (value) {
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+            handleOperator(value);
+            break;
+        case '=':
+            calculate();
+            break;
+        case 'all-clear':
+            clear();
+            break;
+        default:
+            inputNumber(value);
+            break;
+    }
+});
+
+function inputNumber(num) {
+    if (waitingForSecondValue) {
+        display.value = num;
+        waitingForSecondValue = false;
+    } else {
+        display.value = display.value === '' ? num : display.value + num;
+    }
+}
+
+function handleOperator(nextOperator) {
+    const inputValue = parseFloat(display.value);
+    
+    if (operator && waitingForSecondValue) {
+        operator = nextOperator;
+        return;
+    }
+
+    if (firstValue === null) {
+        firstValue = inputValue;
+    } 
+    
+    operator = nextOperator;
+    waitingForSecondValue = true;
+}
+
+function calculate() {
+    const secondValue = parseFloat(display.value);
+
+    if (operator === null || waitingForSecondValue) {
+        return;
+    }
+
+    let result;
+    switch (operator) {
+        case '+':
+            result = firstValue + secondValue;
+            break;
+        case '-':
+            result = firstValue - secondValue;
+            break;
+        case '*':
+            result = firstValue * secondValue;
+            break;
+        case '/':
+            result = firstValue / secondValue;
+            break;
+    }
+
+    display.value = result;
+    firstValue = result;
+    operator = null;
+    waitingForSecondValue = true;
+}
+
+function clear() {
+    display.value = '';
+    firstValue = null;
+    operator = null;
+    waitingForSecondValue = false;
+}
+  </script>
+</body>
+</html>
